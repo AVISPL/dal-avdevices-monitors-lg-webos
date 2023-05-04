@@ -1,6 +1,6 @@
-# dal_avdevices_monitors_lg
+# dal_avdevices_monitors_lg_webos
 
-DAL adapter for Lg LCD monitor
+DAL adapter for Lg WebOS monitors
 
 **Build project with no tests: ``` mvn clean install -DskipTests```**
 

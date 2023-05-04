@@ -2,36 +2,34 @@
  * Copyright (c) 2022 AVI-SPL, Inc. All Rights Reserved.
  */
 
-package com.avispl.symphony.dal.communicator.lg.lcd;
+package com.avispl.symphony.dal.communicator.lg.webos;
 
 /**
- * TileMode class defined the enum provides tile mode status
+ * PowerStatus class provides during the monitoring and controlling process
  *
  * @author Kevin / Symphony Dev Team<br>
- * Created on 12/1/2022
+ * Created on 1/11/2023
  * @version 1.4.0
  * @since 1.4.0
  */
-public enum TileMode {
+public enum PowerStatus {
 
-	ON("On", "01", true),
-	OFF("Off", "00", true);
+	LST("LST (Last Status)", "00"),
+	STD("STD (Standby)", "01"),
+	PWR("PWR (Power On)", "02");
 
 	private final String name;
 	private final String value;
-	private final boolean isStatus;
 
 	/**
-	 * PowerManagement instantiation
+	 * PowerStatus instantiation
 	 *
 	 * @param name {@link #name}
 	 * @param value {@link #value}
-	 * @param isStatus {@link #isStatus}
 	 */
-	TileMode(String name, String value, boolean isStatus) {
+	PowerStatus(String name, String value) {
 		this.name = name;
 		this.value = value;
-		this.isStatus = isStatus;
 	}
 
 	/**
@@ -50,14 +48,5 @@ public enum TileMode {
 	 */
 	public String getValue() {
 		return value;
-	}
-
-	/**
-	 * Retrieves {@link #isStatus}
-	 *
-	 * @return value of {@link #isStatus}
-	 */
-	public boolean isStatus() {
-		return isStatus;
 	}
 }

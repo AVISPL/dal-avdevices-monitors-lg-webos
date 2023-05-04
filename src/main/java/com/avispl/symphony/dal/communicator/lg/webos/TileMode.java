@@ -2,37 +2,36 @@
  * Copyright (c) 2022 AVI-SPL, Inc. All Rights Reserved.
  */
 
-package com.avispl.symphony.dal.communicator.lg.lcd;
+package com.avispl.symphony.dal.communicator.lg.webos;
 
 /**
- * SoundMode class provides during the monitoring and controlling process
+ * TileMode class defined the enum provides tile mode status
  *
  * @author Kevin / Symphony Dev Team<br>
- * Created on 1/11/2023
+ * Created on 12/1/2022
  * @version 1.4.0
  * @since 1.4.0
  */
-public enum SoundMode {
+public enum TileMode {
 
-	STANDARD("Standard", "01"),
-	CINEMA("Cinema", "03"),
-	NEWS("News (Clear Voice IV)", "07"),
-	SPORTS("Sports", "04"),
-	MUSIC("Music", "02"),
-	GAME("Game", "05");
+	ON("On", "01", true),
+	OFF("Off", "00", true);
 
 	private final String name;
 	private final String value;
+	private final boolean isStatus;
 
 	/**
-	 * SoundMode instantiation
+	 * PowerManagement instantiation
 	 *
 	 * @param name {@link #name}
 	 * @param value {@link #value}
+	 * @param isStatus {@link #isStatus}
 	 */
-	SoundMode(String name, String value) {
+	TileMode(String name, String value, boolean isStatus) {
 		this.name = name;
 		this.value = value;
+		this.isStatus = isStatus;
 	}
 
 	/**
@@ -51,5 +50,14 @@ public enum SoundMode {
 	 */
 	public String getValue() {
 		return value;
+	}
+
+	/**
+	 * Retrieves {@link #isStatus}
+	 *
+	 * @return value of {@link #isStatus}
+	 */
+	public boolean isStatus() {
+		return isStatus;
 	}
 }

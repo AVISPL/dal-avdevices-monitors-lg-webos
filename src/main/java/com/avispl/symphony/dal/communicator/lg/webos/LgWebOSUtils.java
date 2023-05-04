@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2022 AVI-SPL, Inc. All Rights Reserved.
  */
-package com.avispl.symphony.dal.communicator.lg.lcd;
+package com.avispl.symphony.dal.communicator.lg.webos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  * @version 1.4.0
  * @since 1.4.0
  */
-public class LgLCDUtils {
+public class LgWebOSUtils {
 
 	static byte[] buildSendString(byte monitorID, byte[] command, byte[] param) {
 		List<Byte> bytes = new ArrayList<>();
