@@ -1,35 +1,35 @@
 /*
  * Copyright (c) 2022 AVI-SPL, Inc. All Rights Reserved.
  */
-
-package com.avispl.symphony.dal.communicator.lg.lcd;
+package com.avispl.symphony.dal.communicator.lg.webos;
 
 /**
- * BrightnessSize  class defined the enum for monitoring and controlling process
+ * PowerManagement class defined the enum provides list power management value
  *
  * @author Kevin / Symphony Dev Team<br>
- * Created on 1/11/2023
+ * Created on 12/1/2022
  * @version 1.4.0
  * @since 1.4.0
  */
-public enum BrightnessSize {
+public enum PowerManagement {
 
-	FULL_SCREEN("Off", "00"),
-	ORIGINAL("Minimum", "01"),
-	MEDIUM("Medium", "02"),
-	MAXIMUM("Maximum", "03"),
-	AUTO("Auto", "04");
+	OFF("Off", "00"),
+	SECOND_10("10 seconds", "02"),
+	MINUTE_1("1 minute", "04"),
+	MINUTE_3("3 minutes", "05"),
+	MINUTE_5("5 minutes", "06"),
+	MINUTE_10("10 minutes", "07");
 
 	private final String name;
 	private final String value;
 
 	/**
-	 * BrightnessSize instantiation
+	 * PowerManagement instantiation
 	 *
 	 * @param name {@link #name}
 	 * @param value {@link #value}
 	 */
-	BrightnessSize(String name, String value) {
+	PowerManagement(String name, String value) {
 		this.name = name;
 		this.value = value;
 	}

@@ -1,31 +1,36 @@
 /*
  * Copyright (c) 2022 AVI-SPL, Inc. All Rights Reserved.
  */
-package com.avispl.symphony.dal.communicator.lg.lcd;
+
+package com.avispl.symphony.dal.communicator.lg.webos;
 
 /**
- * AspectRatio class provides aspect ratio value
+ * SoundMode class provides during the monitoring and controlling process
  *
  * @author Kevin / Symphony Dev Team<br>
  * Created on 1/11/2023
  * @version 1.4.0
  * @since 1.4.0
  */
-public enum AspectRatio {
+public enum SoundMode {
 
-	FULL_SCREEN("Full Screen", "02"),
-	ORIGINAL("Original", "06");
+	STANDARD("Standard", "01"),
+	CINEMA("Cinema", "03"),
+	NEWS("News (Clear Voice IV)", "07"),
+	SPORTS("Sports", "04"),
+	MUSIC("Music", "02"),
+	GAME("Game", "05");
 
 	private final String name;
 	private final String value;
 
 	/**
-	 * AspectRatio instantiation
+	 * SoundMode instantiation
 	 *
 	 * @param name {@link #name}
 	 * @param value {@link #value}
 	 */
-	AspectRatio(String name, String value) {
+	SoundMode(String name, String value) {
 		this.name = name;
 		this.value = value;
 	}

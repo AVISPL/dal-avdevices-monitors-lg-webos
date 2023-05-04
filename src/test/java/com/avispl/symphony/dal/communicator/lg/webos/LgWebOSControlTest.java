@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2022 AVI-SPL, Inc. All Rights Reserved.
  */
-package com.avispl.symphony.dal.communicator.lg.lcd;
+package com.avispl.symphony.dal.communicator.lg.webos;
 
 import static org.mockito.Mockito.times;
 
@@ -10,16 +10,16 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import com.avispl.symphony.api.dal.dto.control.ControllableProperty;
-import com.avispl.symphony.dal.communicator.lg.lcd.LgLCDConstants.controlProperties;
+import com.avispl.symphony.dal.communicator.lg.webos.LgWebOSConstants.controlProperties;
 
 /**
- * Unit test for Control of LgLCDDevice
+ * Unit test for Control of LgWebOSDevice
  *
  * @author Harry
  * @version 1.2
  * @since 1.2
  */
-public class LgLCDControlTest {
+public class LgWebOSControlTest {
 
 	/**
 	 * Set power property with value 1 (On)
@@ -32,9 +32,9 @@ public class LgLCDControlTest {
 		controllableProperty.setProperty(controlProperties.power.name());
 		controllableProperty.setValue("1");
 
-		LgLCDDevice lgLCDDeviceSpy = Mockito.spy(LgLCDDevice.class);
-		lgLCDDeviceSpy.controlProperty(controllableProperty);
-		Mockito.verify(lgLCDDeviceSpy, times(1)).powerON();
+		LgWebOSDevice lgWebOSDeviceSpy = Mockito.spy(LgWebOSDevice.class);
+		lgWebOSDeviceSpy.controlProperty(controllableProperty);
+		Mockito.verify(lgWebOSDeviceSpy, times(1)).powerON();
 	}
 
 	/**
@@ -48,9 +48,9 @@ public class LgLCDControlTest {
 		controllableProperty.setProperty(controlProperties.power.name());
 		controllableProperty.setValue("0");
 
-		LgLCDDevice lgLCDDeviceSpy = Mockito.spy(LgLCDDevice.class);
-		Mockito.doNothing().when(lgLCDDeviceSpy).powerOFF();
-		lgLCDDeviceSpy.controlProperty(controllableProperty);
-		Mockito.verify(lgLCDDeviceSpy, times(1)).powerOFF();
+		LgWebOSDevice lgWebOSDeviceSpy = Mockito.spy(LgWebOSDevice.class);
+		Mockito.doNothing().when(lgWebOSDeviceSpy).powerOFF();
+		lgWebOSDeviceSpy.controlProperty(controllableProperty);
+		Mockito.verify(lgWebOSDeviceSpy, times(1)).powerOFF();
 	}
 }
