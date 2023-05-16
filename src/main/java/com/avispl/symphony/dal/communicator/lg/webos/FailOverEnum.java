@@ -2,38 +2,32 @@
  * Copyright (c) 2022 AVI-SPL, Inc. All Rights Reserved.
  */
 
-package com.avispl.symphony.dal.communicator.lg.lcd;
+package com.avispl.symphony.dal.communicator.lg.webos;
 
 /**
- * PictureMode  class defined the enum for monitoring and controlling process
+ * FailOverEnum class defined the enum provides list fail over status
  *
  * @author Kevin / Symphony Dev Team<br>
- * Created on 1/11/2023
+ * Created on 12/1/2022
  * @version 1.4.0
  * @since 1.4.0
  */
-public enum PictureMode {
+public enum FailOverEnum {
 
-	MALL("Mall/QSR", "00"),
-	GENERAL("General", "01"),
-	TRANSPORTATION("Transportation", "03"),
-	EDUCATION("Education", "04"),
-	GOV("Gov./Corp.", "02"),
-	APS("Auto Power Save", "08"),
-	EXPERT("Expert1", "05"),
-	CALIBRATION("Calibration", "11"),
-	HOSPITAL("Hospital", "12");
+	OFF("Off", "00"),
+	AUTO("Auto", "01"),
+	MANUAL("Manual", "02");
 
 	private final String name;
 	private final String value;
 
 	/**
-	 * PictureMode instantiation
+	 * FailOverEnum instantiation
 	 *
 	 * @param name {@link #name}
 	 * @param value {@link #value}
 	 */
-	PictureMode(String name, String value) {
+	FailOverEnum(String name, String value) {
 		this.name = name;
 		this.value = value;
 	}

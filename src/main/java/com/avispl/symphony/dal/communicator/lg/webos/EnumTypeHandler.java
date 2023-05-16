@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2022 AVI-SPL, Inc. All Rights Reserved.
  */
-package com.avispl.symphony.dal.communicator.lg.lcd;
+package com.avispl.symphony.dal.communicator.lg.webos;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -57,10 +57,10 @@ public class EnumTypeHandler {
 					return (String) method.invoke(c);
 				}
 			} catch (Exception e) {
-				return LgLCDConstants.NA;
+				return LgWebOSConstants.NA;
 			}
 		}
-		return LgLCDConstants.NA;
+		return LgWebOSConstants.NA;
 	}
 
 	/**
@@ -81,9 +81,9 @@ public class EnumTypeHandler {
 					return (String) method.invoke(c);
 				}
 			} catch (Exception e) {
-				return LgLCDConstants.NA;
+				return LgWebOSConstants.NA;
 			}
 		}
-		return LgLCDConstants.NA;
+		return LgWebOSConstants.NA;
 	}
 }

@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2022 AVI-SPL, Inc. All Rights Reserved.
  */
-package com.avispl.symphony.dal.communicator.lg.lcd;
+package com.avispl.symphony.dal.communicator.lg.webos;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.Map;
  * @version 1.4.0
  * @since 1.4.0
  */
-public class LgLCDConstants {
+public class LgWebOSConstants {
 	enum powerStatusNames {ON, OFF, UNAVAILABLE}
 
 	final static Map<powerStatusNames, byte[]> powerStatus = new HashMap<powerStatusNames, byte[]>() {{

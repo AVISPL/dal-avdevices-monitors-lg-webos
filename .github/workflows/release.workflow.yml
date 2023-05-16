@@ -33,7 +33,7 @@ jobs:
       version: ${{ steps.version.outputs.version }}
     steps:
       - id: version
-        run: echo "version=${{ needs.prep.outputs.ver }}-SNAPSHOT-${{ needs.prep.outputs.date }}-${{ needs.prep.outputs.rev }}" >> $GITHUB_OUTPUT
+        run: echo "version=${{ needs.prep.outputs.ver }}-${{ needs.prep.outputs.date }}-${{ needs.prep.outputs.rev }}" >> $GITHUB_OUTPUT
   build:
     runs-on: ubuntu-latest
     needs: versiongenerate
@@ -52,8 +52,8 @@ jobs:
       - name: PMD check
         run: mvn pmd:check
       - id: getfilename
-        run: echo "file=$(ls target/symphony-dal-communicator-lg-lcd-${{ needs.versiongenerate.outputs.version }}.jar)" >> $GITHUB_OUTPUT
+        run: echo "file=$(ls target/symphony-dal-communicator-lg-webos-${{ needs.versiongenerate.outputs.version }}.jar)" >> $GITHUB_OUTPUT
       - uses: actions/upload-artifact@v3
         with:
-          name: LGLCD
+          name: LGWebOS
           path: ${{ steps.getfilename.outputs.file }}
