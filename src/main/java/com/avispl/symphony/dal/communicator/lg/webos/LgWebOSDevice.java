@@ -1454,13 +1454,11 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 	 */
 	private void populateMonitoringData(Map<String, String> statistics, Map<String, String> dynamicStatistics) {
 		//The flow code is handled in the previous version
-		String inputGroupName = LgWebOSConstants.INPUT + LgWebOSConstants.HASH;
 		String signal = getValueByName(LgWebOSConstants.SIGNAL);
 		if (LgWebOSConstants.NA.equals(signal)) {
 			signal = syncStatusNames.NO_SYNC.name();
 		}
 		addOrUpdateStatisticProperties(statistics, LgWebOSConstants.SIGNAL, signal);
-		addOrUpdateStatisticProperties(statistics, inputGroupName + LgWebOSConstants.SIGNAL, signal);
 		String inputSignal = getValueByName(LgWebOSConstants.INPUT_SELECT);
 		addOrUpdateStatisticProperties(statistics, LgWebOSConstants.INPUT_SELECT, inputSignal);
 
