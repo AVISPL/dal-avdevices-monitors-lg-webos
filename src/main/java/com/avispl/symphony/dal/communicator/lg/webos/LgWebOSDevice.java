@@ -514,8 +514,8 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 						stats.put(LgWebOSConstants.INPUT_SELECT, inputSelect);
 						retrieveDataByCommandName(commandNames.SYNC_STATUS, commandNames.SYNC_STATUS_PARAM, lgControllingCommand);
 						String signal = getValueByName(LgWebOSConstants.SIGNAL);
-						stats.put(LgWebOSConstants.SIGNAL, signal);
-						stats.put(group + LgWebOSConstants.SIGNAL, signal);
+						addOrUpdateStatisticProperties(stats,LgWebOSConstants.SIGNAL, signal);
+						addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.SIGNAL, signal);
 						updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.SIGNAL, signal);
 						updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.INPUT_SELECT, inputSelect);
 						break;
@@ -608,12 +608,12 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 								if (LgWebOSConstants.PLAY_VIA_URL.equalsIgnoreCase(entry.getValue())) {
 									continue;
 								}
-								stats.put(group + entry.getKey(), entry.getValue());
+								addOrUpdateStatisticProperties(stats,group + entry.getKey(), entry.getValue());
 							}
-							stats.put(group + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.EMPTY_STRING);
+							addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.EMPTY_STRING);
 							advancedControllableProperties.add(createButton(group + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.UP, LgWebOSConstants.PROCESSING, 0));
 
-							stats.put(group + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.EMPTY_STRING);
+							addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.EMPTY_STRING);
 							advancedControllableProperties.add(createButton(group + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.DOWN, LgWebOSConstants.PROCESSING, 0));
 
 							String[] inputSelected = cacheMapOfPriorityInputAndValue.values().stream().filter(item -> !item.equalsIgnoreCase(LgWebOSConstants.PLAY_VIA_URL)).collect(Collectors.toList())
@@ -632,7 +632,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 							AdvancedControllableProperty controlInputSource = controlDropdown(stats, inputSelected, group + LgWebOSConstants.PRIORITY_INPUT, inputSourceDefaultValue);
 							checkControlPropertyBeforeAddNewProperty(controlInputSource, advancedControllableProperties);
 						}
-						stats.put(LgWebOSConstants.FAILOVER_MODE, failoverStatus);
+						addOrUpdateStatisticProperties(stats,LgWebOSConstants.FAILOVER_MODE, failoverStatus);
 						updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.FAILOVER_MODE, failoverStatus);
 						break;
 					case PRIORITY_INPUT:
@@ -677,7 +677,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 						}
 						sendRequestToControlValue(commandNames.FAILOVER_INPUT_LIST, stringBuilder.substring(0, stringBuilder.length() - 1).getBytes(StandardCharsets.UTF_8), false, value);
 						for (Entry<String, String> input : cacheMapOfPriorityInputAndValue.entrySet()) {
-							stats.put(group + input.getKey(), input.getValue());
+							addOrUpdateStatisticProperties(stats,group + input.getKey(), input.getValue());
 						}
 						populatePriorityInput(stats, advancedControllableProperties, group, currentPriority);
 						break;
@@ -722,7 +722,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 								continue;
 							}
 							stats.remove(group + entry.getKey());
-							stats.put(group + entry.getKey(), entry.getValue());
+							addOrUpdateStatisticProperties(stats,group + entry.getKey(), entry.getValue());
 						}
 						populatePriorityInput(stats, advancedControllableProperties, group, currentPriority);
 						break;
@@ -754,16 +754,16 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 							checkControlPropertyBeforeAddNewProperty(controlNaturalMode, advancedControllableProperties);
 							if (String.valueOf(LgWebOSConstants.NUMBER_ONE).equals(naturalMode)) {
 								retrieveDataByCommandName(commandNames.NATURAL_SIZE, commandNames.NATURAL_SIZE_PARAM, lgControllingCommand);
-								stats.put(group + LgWebOSConstants.NATURAL_SIZE, getValueByName(LgWebOSConstants.NATURAL_SIZE));
+								addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.NATURAL_SIZE, getValueByName(LgWebOSConstants.NATURAL_SIZE));
 							}
 							retrieveDataByCommandName(commandNames.TILE_ID, commandNames.GET, lgControllingCommand);
 							String tileModeID = getValueByName(LgWebOSConstants.TILE_MODE_ID);
 							if (!LgWebOSConstants.NA.equals(tileModeID)) {
 								tileModeID = String.valueOf(Integer.parseInt(tileModeID));
 							}
-							stats.put(group + LgWebOSConstants.TILE_MODE_ID, tileModeID);
+							addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.TILE_MODE_ID, tileModeID);
 						}
-						stats.put(LgWebOSConstants.TILE_MODE, tileModeValue);
+						addOrUpdateStatisticProperties(stats,LgWebOSConstants.TILE_MODE, tileModeValue);
 						updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.TILE_MODE, tileModeValue);
 						break;
 					case NATURAL_MODE:
@@ -777,7 +777,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 							paramNatural = paramNatural + LgWebOSConstants.NUMBER_ONE;
 							sendRequestToControlValue(commandNames.NATURAL_MODE, paramNatural.getBytes(StandardCharsets.UTF_8), false, value);
 							retrieveDataByCommandName(commandNames.NATURAL_SIZE, commandNames.NATURAL_SIZE_PARAM, lgControllingCommand);
-							stats.put(group + LgWebOSConstants.NATURAL_SIZE, getValueByName(LgWebOSConstants.NATURAL_SIZE));
+							addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.NATURAL_SIZE, getValueByName(LgWebOSConstants.NATURAL_SIZE));
 						}
 						updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.NATURAL_MODE, String.valueOf(Integer.parseInt(paramNatural)));
 						break;
@@ -978,21 +978,21 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 			}
 		}
 		if (LgWebOSConstants.NA.equals(currentPriority) || cacheMapOfPriorityInputAndValue.isEmpty()) {
-			stats.put(groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.NA);
-			stats.put(groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.NA);
+			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.NA);
+			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.NA);
 			return;
 		}
 		if (!currentPriority.equals(priorityInputStart) && !currentPriority.equals(priorityInputEnd)) {
-			stats.put(groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.EMPTY_STRING);
+			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.EMPTY_STRING);
 			advancedControllableProperties.add(createButton(groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.UP, LgWebOSConstants.PROCESSING, 0));
 
-			stats.put(groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.EMPTY_STRING);
+			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.EMPTY_STRING);
 			advancedControllableProperties.add(createButton(groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.DOWN, LgWebOSConstants.PROCESSING, 0));
 		} else if (!StringUtils.isNullOrEmpty(priorityInputEnd) && !currentPriority.equals(priorityInputEnd)) {
-			stats.put(groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.EMPTY_STRING);
+			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.EMPTY_STRING);
 			advancedControllableProperties.add(createButton(groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.DOWN, LgWebOSConstants.PROCESSING, 0));
 		} else {
-			stats.put(groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.EMPTY_STRING);
+			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.EMPTY_STRING);
 			advancedControllableProperties.add(createButton(groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.UP, LgWebOSConstants.PROCESSING, 0));
 		}
 	}
@@ -1129,47 +1129,34 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 								localCacheMapOfPropertyNameAndValue.remove(LgWebOSConstants.GATEWAY);
 								localCacheMapOfPropertyNameAndValue.remove(LgWebOSConstants.SUBNET_MASK);
 								localCacheMapOfPropertyNameAndValue.remove(LgWebOSConstants.DNS_SERVER);
-								statistics.put(LgWebOSConstants.GATEWAY, LgWebOSConstants.NA);
-								statistics.put(LgWebOSConstants.SUBNET_MASK, LgWebOSConstants.NA);
-								statistics.put(LgWebOSConstants.DNS_SERVER, LgWebOSConstants.NA);
-								statistics.put(LgWebOSConstants.IP_ADDRESS, LgWebOSConstants.NA);
 								break;
 							case TILE_MODE_SETTINGS:
 								String groupName = LgWebOSConstants.TILE_MODE_SETTINGS + LgWebOSConstants.HASH;
 								if (String.valueOf(LgWebOSConstants.NUMBER_ONE).equalsIgnoreCase(statistics.get(groupName + LgWebOSConstants.TILE_MODE))) {
 									if (String.valueOf(LgWebOSConstants.NUMBER_ONE).equalsIgnoreCase(statistics.get(groupName + LgWebOSConstants.NATURAL_MODE))) {
-										statistics.put(groupName + LgWebOSConstants.NATURAL_SIZE, LgWebOSConstants.NA);
 										updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.NATURAL_SIZE, LgWebOSConstants.NA);
 									}
-									statistics.put(groupName + LgWebOSConstants.NATURAL_MODE, LgWebOSConstants.NA);
 									updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.NATURAL_MODE, LgWebOSConstants.NA);
 									advancedControllableProperties.removeIf(item -> item.getName().equals(groupName + LgWebOSConstants.NATURAL_MODE));
-									statistics.put(groupName + LgWebOSConstants.TILE_MODE_ID, LgWebOSConstants.NA);
 								}
 								updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.TILE_MODE_COLUMN, LgWebOSConstants.NA);
 								updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.TILE_MODE_ROW, LgWebOSConstants.NA);
 								updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.TILE_MODE, LgWebOSConstants.NA);
 								updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.TILE_MODE_ID, LgWebOSConstants.NA);
-								statistics.put(groupName + LgWebOSConstants.TILE_MODE_COLUMN, LgWebOSConstants.NA);
-								statistics.put(groupName + LgWebOSConstants.TILE_MODE_ROW, LgWebOSConstants.NA);
-								statistics.put(groupName + LgWebOSConstants.TILE_MODE, LgWebOSConstants.NA);
 								advancedControllableProperties.removeIf(item -> item.getName().equals(groupName + LgWebOSConstants.TILE_MODE));
 								break;
 							case NATURAL_MODE:
 								groupName = LgWebOSConstants.TILE_MODE_SETTINGS + LgWebOSConstants.HASH;
 								if (String.valueOf(LgWebOSConstants.NUMBER_ONE).equalsIgnoreCase(statistics.get(groupName + LgWebOSConstants.NATURAL_MODE))) {
-									statistics.put(groupName + LgWebOSConstants.NATURAL_SIZE, LgWebOSConstants.NA);
 									updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.NATURAL_SIZE, LgWebOSConstants.NA);
 								}
 								updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.NATURAL_MODE, LgWebOSConstants.NA);
-								statistics.put(groupName + LgWebOSConstants.NATURAL_MODE, LgWebOSConstants.NA);
 								advancedControllableProperties.removeIf(item -> item.getName().equals(groupName + LgWebOSConstants.NATURAL_MODE));
 								break;
 							case DATE:
 							case TIME:
 								updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.DATE, LgWebOSConstants.NA);
 								updateCachedDeviceData(localCacheMapOfPropertyNameAndValue, LgWebOSConstants.TIME, LgWebOSConstants.NA);
-								statistics.put(LgWebOSConstants.DATE_TIME, LgWebOSConstants.NA);
 								localCacheMapOfPropertyNameAndValue.remove(value);
 								break;
 							default:
@@ -1183,7 +1170,6 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 									return propertyName.equals(value);
 								}).findFirst().orElse(null);
 								if (property != null) {
-									statistics.put(property.getKey(), LgWebOSConstants.NA);
 									advancedControllableProperties.removeIf(item -> item.getName().equals(property.getKey()));
 									localCacheMapOfPropertyNameAndValue.remove(value);
 								}
@@ -1328,7 +1314,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 				AdvancedControllableProperty controlPower = controlSwitch(controlStatistics, LgWebOSConstants.POWER, value, LgWebOSConstants.OFF, LgWebOSConstants.ON);
 				checkControlPropertyBeforeAddNewProperty(controlPower, advancedControllableProperties);
 
-				controlStatistics.put(LgWebOSConstants.REBOOT, LgWebOSConstants.EMPTY_STRING);
+				addOrUpdateStatisticProperties(controlStatistics,LgWebOSConstants.REBOOT, LgWebOSConstants.EMPTY_STRING);
 				advancedControllableProperties.add(createButton(LgWebOSConstants.REBOOT, LgWebOSConstants.REBOOT, LgWebOSConstants.PROCESSING, 0));
 				break;
 			case ASPECT_RATIO:
@@ -1468,27 +1454,25 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 	 */
 	private void populateMonitoringData(Map<String, String> statistics, Map<String, String> dynamicStatistics) {
 		//The flow code is handled in the previous version
-		String inputGroupName = LgWebOSConstants.INPUT + LgWebOSConstants.HASH;
 		String signal = getValueByName(LgWebOSConstants.SIGNAL);
 		if (LgWebOSConstants.NA.equals(signal)) {
 			signal = syncStatusNames.NO_SYNC.name();
 		}
-		statistics.put(LgWebOSConstants.SIGNAL, signal);
-		statistics.put(inputGroupName + LgWebOSConstants.SIGNAL, signal);
+		addOrUpdateStatisticProperties(statistics, LgWebOSConstants.SIGNAL, signal);
 		String inputSignal = getValueByName(LgWebOSConstants.INPUT_SELECT);
-		statistics.put(LgWebOSConstants.INPUT_SELECT, inputSignal);
+		addOrUpdateStatisticProperties(statistics, LgWebOSConstants.INPUT_SELECT, inputSignal);
 
 		String fan = getValueByName(LgWebOSConstants.FAN);
 		if (LgWebOSConstants.NA.equals(fan)) {
 			fan = fanStatusNames.NO_FAN.name();
 		}
-		statistics.put(LgWebOSConstants.FAN, fan);
+		addOrUpdateStatisticProperties(statistics, LgWebOSConstants.FAN, fan);
 
 		String temperatureValue = getValueByName(LgWebOSConstants.TEMPERATURE);
 		if (!historicalProperties.isEmpty() && historicalProperties.contains(LgWebOSConstants.TEMPERATURE)) {
-			dynamicStatistics.put(LgWebOSConstants.TEMPERATURE, temperatureValue);
+			addOrUpdateStatisticProperties(dynamicStatistics,LgWebOSConstants.TEMPERATURE, temperatureValue);
 		} else {
-			statistics.put(LgWebOSConstants.TEMPERATURE, temperatureValue);
+			addOrUpdateStatisticProperties(statistics,LgWebOSConstants.TEMPERATURE, temperatureValue);
 		}
 		//new feature retrieve device dashboard
 		String software = getValueByName(LgWebOSConstants.SOFTWARE_VERSION);
@@ -1506,22 +1490,22 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 		if (!LgWebOSConstants.OFF.equals(standbyMode) && !LgWebOSConstants.NA.equals(standbyMode)) {
 			standbyMode = LgWebOSConstants.ON;
 		}
-		statistics.put(LgWebOSConstants.DATE_TIME, dateTimeValue);
-		statistics.put(LgWebOSConstants.FAILOVER_MODE, failover);
-		statistics.put(LgWebOSConstants.SOFTWARE_VERSION, software);
-		statistics.put(LgWebOSConstants.TILE_MODE, tileMode);
-		statistics.put(LgWebOSConstants.SERIAL_NUMBER, serialNumber);
-		statistics.put(LgWebOSConstants.DISPLAY_STAND_BY_MODE, standbyMode);
+		addOrUpdateStatisticProperties(statistics,LgWebOSConstants.DATE_TIME, dateTimeValue);
+		addOrUpdateStatisticProperties(statistics,LgWebOSConstants.FAILOVER_MODE, failover);
+		addOrUpdateStatisticProperties(statistics,LgWebOSConstants.SOFTWARE_VERSION, software);
+		addOrUpdateStatisticProperties(statistics,LgWebOSConstants.TILE_MODE, tileMode);
+		addOrUpdateStatisticProperties(statistics,LgWebOSConstants.SERIAL_NUMBER, serialNumber);
+		addOrUpdateStatisticProperties(statistics,LgWebOSConstants.DISPLAY_STAND_BY_MODE, standbyMode);
 
 		//populate Network information
 		String ipAddress = getValueByName(LgWebOSConstants.IP_ADDRESS);
 		String gateway = getValueByName(LgWebOSConstants.GATEWAY);
 		String subnetMask = getValueByName(LgWebOSConstants.SUBNET_MASK);
 		String dnsServer = getValueByName(LgWebOSConstants.DNS_SERVER);
-		statistics.put(LgWebOSConstants.GATEWAY, gateway);
-		statistics.put(LgWebOSConstants.SUBNET_MASK, subnetMask);
-		statistics.put(LgWebOSConstants.DNS_SERVER, dnsServer);
-		statistics.put(LgWebOSConstants.IP_ADDRESS, ipAddress);
+		addOrUpdateStatisticProperties(statistics,LgWebOSConstants.GATEWAY, gateway);
+		addOrUpdateStatisticProperties(statistics,LgWebOSConstants.SUBNET_MASK, subnetMask);
+		addOrUpdateStatisticProperties(statistics,LgWebOSConstants.DNS_SERVER, dnsServer);
+		addOrUpdateStatisticProperties(statistics,LgWebOSConstants.IP_ADDRESS, ipAddress);
 	}
 
 	/**
@@ -1541,8 +1525,8 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 		AdvancedControllableProperty controlTileMode = controlSwitch(controlStatistics, groupName + LgWebOSConstants.TILE_MODE, tileModeValue, LgWebOSConstants.OFF, LgWebOSConstants.ON);
 		checkControlPropertyBeforeAddNewProperty(controlTileMode, advancedControllableProperties);
 
-		controlStatistics.put(groupName + LgWebOSConstants.TILE_MODE_COLUMN, getValueByName(LgWebOSConstants.TILE_MODE_COLUMN));
-		controlStatistics.put(groupName + LgWebOSConstants.TILE_MODE_ROW, getValueByName(LgWebOSConstants.TILE_MODE_ROW));
+		addOrUpdateStatisticProperties(controlStatistics,groupName + LgWebOSConstants.TILE_MODE_COLUMN, getValueByName(LgWebOSConstants.TILE_MODE_COLUMN));
+		addOrUpdateStatisticProperties(controlStatistics,groupName + LgWebOSConstants.TILE_MODE_ROW, getValueByName(LgWebOSConstants.TILE_MODE_ROW));
 
 		//NaturalMode
 		if (LgWebOSConstants.ON.equals(tileMode)) {
@@ -1552,7 +1536,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 			if (!LgWebOSConstants.NA.equals(tileModeID)) {
 				tileModeID = String.valueOf(Integer.parseInt(tileModeID));
 			}
-			controlStatistics.put(groupName + LgWebOSConstants.TILE_MODE_ID, tileModeID);
+			addOrUpdateStatisticProperties(controlStatistics,groupName + LgWebOSConstants.TILE_MODE_ID, tileModeID);
 			String naturalMode = getValueByName(LgWebOSConstants.NATURAL_MODE);
 			if (!LgWebOSConstants.NA.equals(naturalMode)) {
 				naturalMode = String.valueOf(LgWebOSConstants.ZERO == Integer.parseInt(naturalMode) ? 0 : 1);
@@ -1560,7 +1544,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 			AdvancedControllableProperty controlNaturalMode = controlSwitch(controlStatistics, groupName + LgWebOSConstants.NATURAL_MODE, naturalMode, LgWebOSConstants.OFF, LgWebOSConstants.ON);
 			checkControlPropertyBeforeAddNewProperty(controlNaturalMode, advancedControllableProperties);
 			if (String.valueOf(LgWebOSConstants.NUMBER_ONE).equals(naturalMode)) {
-				controlStatistics.put(groupName + LgWebOSConstants.NATURAL_SIZE, getValueByName(LgWebOSConstants.NATURAL_SIZE));
+				addOrUpdateStatisticProperties(controlStatistics,groupName + LgWebOSConstants.NATURAL_SIZE, getValueByName(LgWebOSConstants.NATURAL_SIZE));
 			}
 		}
 	}
@@ -1576,7 +1560,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 		String failOver = getValueByName(LgWebOSConstants.FAILOVER_MODE);
 		int failOverValue = LgWebOSConstants.NUMBER_ONE;
 		if (LgWebOSConstants.NA.equals(failOver)) {
-			controlStatistics.put(groupName + LgWebOSConstants.INPUT_PRIORITY, failOver);
+			addOrUpdateStatisticProperties(controlStatistics,groupName + LgWebOSConstants.INPUT_PRIORITY, failOver);
 			return;
 		}
 		if (LgWebOSConstants.OFF.equalsIgnoreCase(failOver)) {
@@ -1594,7 +1578,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 				if (LgWebOSConstants.PLAY_VIA_URL.equalsIgnoreCase(entry.getValue())) {
 					continue;
 				}
-				controlStatistics.put(groupName + entry.getKey(), entry.getValue());
+				addOrUpdateStatisticProperties(controlStatistics,groupName + entry.getKey(), entry.getValue());
 			}
 			String[] inputSelected = cacheMapOfPriorityInputAndValue.values().stream().filter(item -> !item.equalsIgnoreCase(LgWebOSConstants.PLAY_VIA_URL)).collect(Collectors.toList())
 					.toArray(new String[0]);
@@ -1653,9 +1637,6 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 			AdvancedControllableProperty controlInputSource = controlDropdown(statistics, inputDropdown, inputGroupName + LgWebOSConstants.INPUT_SELECT, inputSourceValue);
 			checkControlPropertyBeforeAddNewProperty(controlInputSource, advancedControllableProperties);
 			statistics.put(LgWebOSConstants.INPUT_SELECT, inputSourceValue);
-		} else {
-			statistics.put(inputGroupName + LgWebOSConstants.INPUT_SELECT, LgWebOSConstants.NA);
-			statistics.put(LgWebOSConstants.INPUT_SELECT, LgWebOSConstants.NA);
 		}
 		String[] pmdDropdown = EnumTypeHandler.getEnumNames(PowerManagement.class);
 		AdvancedControllableProperty controlPMD = controlDropdown(statistics, pmdDropdown, powerManagementGroupName + LgWebOSConstants.DISPLAY_STAND_BY_MODE,
@@ -1696,6 +1677,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 			return digestResponse(response, command).toString();
 		} catch (Exception ce) {
 			failedMonitor.add(lgControllingCommand.getName());
+			this.logger.warn(String.format("An error occurred when sending command %s to retrieve data", command.name()), ce);
 			return LgWebOSConstants.NA;
 		}
 	}
@@ -1714,6 +1696,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 			if (this.logger.isDebugEnabled()) {
 				this.logger.debug("error during power OFF send", e);
 			}
+			throw new IllegalArgumentException("An error occurred when control power on", e);
 		}
 	}
 
@@ -1731,6 +1714,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 			if (this.logger.isDebugEnabled()) {
 				this.logger.debug("error during power ON send", e);
 			}
+			throw new IllegalArgumentException("An error occurred when control power off", e);
 		}
 	}
 
@@ -2167,9 +2151,6 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 	 */
 	private AdvancedControllableProperty controlSwitch(Map<String, String> stats, String name, String value, String labelOff, String labelOn) {
 		if (StringUtils.isNullOrEmpty(value) || LgWebOSConstants.NA.equals(value)) {
-			value = LgWebOSConstants.NA;
-			stats.put(name, value);
-			// if response data is null or none. Only display monitoring data not display controlling data
 			return null;
 		}
 		stats.put(name, value);
@@ -2226,7 +2207,6 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 	 */
 	private AdvancedControllableProperty createControlSlider(String name, String value, Map<String, String> stats, String rangeStart, String rangeEnd) {
 		if (StringUtils.isNullOrEmpty(value) || LgWebOSConstants.NA.equals(value)) {
-			stats.put(name, LgWebOSConstants.NA);
 			return null;
 		}
 		stats.put(name, value);
@@ -2243,7 +2223,6 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 	 */
 	private AdvancedControllableProperty controlDropdown(Map<String, String> stats, String[] options, String name, String value) {
 		if (StringUtils.isNullOrEmpty(value) || LgWebOSConstants.NA.equals(value)) {
-			stats.put(name, LgWebOSConstants.NA);
 			return null;
 		}
 		stats.put(name, value);
@@ -2353,5 +2332,18 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 			pollingIntervalValue = LgWebOSConstants.DEFAULT_POLLING_INTERVAL;
 		}
 		pollingIntervalInIntValue = pollingIntervalValue;
+	}
+
+	/**
+	 * Add or Modify statistic properties if values are not N/A
+	 *
+	 * @param statistics monitoring properties
+	 * @param propertyName name of property
+	 * @param propertyValue value of property
+	 */
+	private void addOrUpdateStatisticProperties(Map<String, String> statistics, String propertyName, String propertyValue) {
+		if (!propertyValue.equals(LgWebOSConstants.NA)) {
+			statistics.put(propertyName, propertyValue);
+		}
 	}
 }
