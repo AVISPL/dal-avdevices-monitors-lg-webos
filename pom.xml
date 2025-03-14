@@ -6,7 +6,7 @@
 
     <groupId>com.avispl.symphony.dal.device.lg.webos</groupId>
     <artifactId>symphony-dal-communicator-lg-webos</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <properties>
         <symphonyApiVersion>RELEASE</symphonyApiVersion>
         <symphonySystemCoreVersion>5.12.0</symphonySystemCoreVersion>
