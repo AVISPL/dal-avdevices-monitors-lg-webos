@@ -33,7 +33,7 @@ public enum LgControllingCommand {
 	FAN_STATUS(LgWebOSConstants.FAN, true, false, LgWebOSConstants.commandNames.FAN_STATUS),
 	SYNC_STATUS(LgWebOSConstants.SIGNAL, true, false, LgWebOSConstants.commandNames.SYNC_STATUS),
 	FAILOVER(LgWebOSConstants.FAILOVER_MODE, true, false, LgWebOSConstants.commandNames.FAILOVER),
-	TILE_MODE(LgWebOSConstants.TILE_MODE, true, false, LgWebOSConstants.commandNames.TILE_MODE_CONTROL),
+	TILE_MODE(LgWebOSConstants.TILE_MODE, false, false, LgWebOSConstants.commandNames.TILE_MODE_CONTROL),
 	NATURAL_MODE(LgWebOSConstants.NATURAL_MODE, true, false, LgWebOSConstants.commandNames.NATURAL_MODE),
 	TILE_ID(LgWebOSConstants.TILE_MODE_ID, true, false, LgWebOSConstants.commandNames.TILE_ID),
 	NATURAL_SIZE(LgWebOSConstants.NATURAL_SIZE, true, false, LgWebOSConstants.commandNames.NATURAL_SIZE),

@@ -759,7 +759,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 							retrieveDataByCommandName(commandNames.TILE_ID, commandNames.GET, lgControllingCommand);
 							String tileModeID = getValueByName(LgWebOSConstants.TILE_MODE_ID);
 							if (!LgWebOSConstants.NA.equals(tileModeID)) {
-								tileModeID = String.valueOf(Integer.parseInt(tileModeID));
+								tileModeID = String.valueOf(Integer.parseInt(tileModeID, 16));
 							}
 							addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.TILE_MODE_ID, tileModeID);
 						}
@@ -1534,7 +1534,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 			//Retrieve Tile ID
 			String tileModeID = getValueByName(LgWebOSConstants.TILE_MODE_ID);
 			if (!LgWebOSConstants.NA.equals(tileModeID)) {
-				tileModeID = String.valueOf(Integer.parseInt(tileModeID));
+				tileModeID = String.valueOf(Integer.parseInt(tileModeID, 16));
 			}
 			addOrUpdateStatisticProperties(controlStatistics,groupName + LgWebOSConstants.TILE_MODE_ID, tileModeID);
 			String naturalMode = getValueByName(LgWebOSConstants.NATURAL_MODE);
