@@ -6,7 +6,6 @@
   <version>1.0.2</version>
   <properties>
     <symphonyApiVersion>RELEASE</symphonyApiVersion>
-    <symphonySystemCoreVersion>5.12.0</symphonySystemCoreVersion>
   </properties>
   <build>
     <plugins>
@@ -108,21 +107,21 @@
     <dependency>
       <groupId>com.avispl.symphony.api</groupId>
       <artifactId>symphony-api-dal</artifactId>
-      <version>${symphonySystemCoreVersion}</version>
+      <version>${symphonyApiVersion}</version>
       <scope>system</scope>
       <systemPath>${basedir}/lib/symphony-api-dal-6.3.0.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>com.avispl.symphony.dal</groupId>
       <artifactId>symphony-dal-commons</artifactId>
-      <version>${symphonySystemCoreVersion}</version>
+      <version>${symphonyApiVersion}</version>
       <scope>system</scope>
       <systemPath>${basedir}/lib/symphony-dal-commons-6.5.0.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>com.avispl.symphony.api</groupId>
       <artifactId>symphony-api-commons</artifactId>
-      <version>${symphonySystemCoreVersion}</version>
+      <version>${symphonyApiVersion}</version>
       <scope>system</scope>
       <systemPath>${basedir}/lib/symphony-api-commons-6.2.0.jar</systemPath>
     </dependency>
@@ -199,12 +198,6 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-inline</artifactId>
       <version>3.8.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>

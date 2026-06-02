@@ -3,33 +3,6 @@
  */
 package com.avispl.symphony.dal.communicator.lg.webos;
 
-import java.net.ConnectException;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
-
-import org.springframework.util.CollectionUtils;
-
 import com.avispl.symphony.api.dal.control.Controller;
 import com.avispl.symphony.api.dal.dto.control.AdvancedControllableProperty;
 import com.avispl.symphony.api.dal.dto.control.ControllableProperty;
@@ -44,6 +17,18 @@ import com.avispl.symphony.dal.communicator.lg.webos.LgWebOSConstants.fanStatusN
 import com.avispl.symphony.dal.communicator.lg.webos.LgWebOSConstants.replyStatusNames;
 import com.avispl.symphony.dal.communicator.lg.webos.LgWebOSConstants.syncStatusNames;
 import com.avispl.symphony.dal.util.StringUtils;
+import org.springframework.util.CollectionUtils;
+
+import java.net.ConnectException;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.*;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 /**
  * LG WebOS Device Adapter
@@ -207,7 +192,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 	protected void internalDestroy() {
 		if (localExtendedStatistics != null && localExtendedStatistics.getStatistics() != null && localExtendedStatistics.getControllableProperties() != null) {
 			localExtendedStatistics.getStatistics().clear();
-			localExtendedStatistics.getControllableProperties().clear();
+			localExtendedStatistics.setControllableProperties(new ArrayList<>());
 		}
 		if (!cacheMapOfPriorityInputAndValue.isEmpty()) {
 			cacheMapOfPriorityInputAndValue.clear();
@@ -878,6 +863,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 				}
 			}
 			updateValueForTheControllableProperty(property, value, stats, advancedControllableProperties);
+			this.localExtendedStatistics.setControllableProperties(advancedControllableProperties);
 		} finally {
 			reentrantLock.unlock();
 		}
