@@ -595,10 +595,10 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 								}
 								addOrUpdateStatisticProperties(stats,group + entry.getKey(), entry.getValue());
 							}
-							addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.EMPTY_STRING);
+							addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.NA);
 							advancedControllableProperties.add(createButton(group + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.UP, LgWebOSConstants.PROCESSING, 0));
 
-							addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.EMPTY_STRING);
+							addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.NA);
 							advancedControllableProperties.add(createButton(group + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.DOWN, LgWebOSConstants.PROCESSING, 0));
 
 							String[] inputSelected = cacheMapOfPriorityInputAndValue.values().stream().filter(item -> !item.equalsIgnoreCase(LgWebOSConstants.PLAY_VIA_URL)).collect(Collectors.toList())
@@ -969,16 +969,16 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 			return;
 		}
 		if (!currentPriority.equals(priorityInputStart) && !currentPriority.equals(priorityInputEnd)) {
-			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.EMPTY_STRING);
+			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.NA);
 			advancedControllableProperties.add(createButton(groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.UP, LgWebOSConstants.PROCESSING, 0));
 
-			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.EMPTY_STRING);
+			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.NA);
 			advancedControllableProperties.add(createButton(groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.DOWN, LgWebOSConstants.PROCESSING, 0));
 		} else if (!StringUtils.isNullOrEmpty(priorityInputEnd) && !currentPriority.equals(priorityInputEnd)) {
-			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.EMPTY_STRING);
+			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.NA);
 			advancedControllableProperties.add(createButton(groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.DOWN, LgWebOSConstants.PROCESSING, 0));
 		} else {
-			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.EMPTY_STRING);
+			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.NA);
 			advancedControllableProperties.add(createButton(groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.UP, LgWebOSConstants.PROCESSING, 0));
 		}
 	}
@@ -1218,8 +1218,10 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 		if (!advancedControllableProperties.isEmpty()) {
 			for (AdvancedControllableProperty advancedControllableProperty : advancedControllableProperties) {
 				if (advancedControllableProperty.getName().equals(property)) {
-					extendedStatistics.put(property, value);
-					advancedControllableProperty.setValue(value);
+					// buttons have no state: they always report N/A, not the pressed value
+					String newValue = advancedControllableProperty.getType() instanceof AdvancedControllableProperty.Button ? LgWebOSConstants.NA : value;
+					extendedStatistics.put(property, newValue);
+					advancedControllableProperty.setValue(newValue);
 					break;
 				}
 			}
@@ -1300,7 +1302,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 				AdvancedControllableProperty controlPower = controlSwitch(controlStatistics, LgWebOSConstants.POWER, value, LgWebOSConstants.OFF, LgWebOSConstants.ON);
 				checkControlPropertyBeforeAddNewProperty(controlPower, advancedControllableProperties);
 
-				addOrUpdateStatisticProperties(controlStatistics,LgWebOSConstants.REBOOT, LgWebOSConstants.EMPTY_STRING);
+				addOrUpdateStatisticProperties(controlStatistics,LgWebOSConstants.REBOOT, LgWebOSConstants.NA);
 				advancedControllableProperties.add(createButton(LgWebOSConstants.REBOOT, LgWebOSConstants.REBOOT, LgWebOSConstants.PROCESSING, 0));
 				break;
 			case ASPECT_RATIO:
@@ -2244,7 +2246,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 		button.setLabel(label);
 		button.setLabelPressed(labelPressed);
 		button.setGracePeriod(gracePeriod);
-		return new AdvancedControllableProperty(name, new Date(), button, LgWebOSConstants.EMPTY_STRING);
+		return new AdvancedControllableProperty(name, new Date(), button, LgWebOSConstants.NA);
 	}
 
 	/**
