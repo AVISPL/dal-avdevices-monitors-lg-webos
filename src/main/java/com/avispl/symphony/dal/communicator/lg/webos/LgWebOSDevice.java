@@ -19,9 +19,6 @@ import com.avispl.symphony.dal.communicator.lg.webos.LgWebOSConstants.syncStatus
 import com.avispl.symphony.dal.util.StringUtils;
 import org.springframework.util.CollectionUtils;
 
-import java.net.ConnectException;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
@@ -232,53 +229,6 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 		this.setCommandSuccessList(Collections.singletonList("OK"));
 		// set list of error response strings (included at the end of response when command fails, typically ending with command prompt)
 		this.setCommandErrorList(Collections.singletonList("NG"));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 *
-	 * Check for available devices before retrieving the value
-	 * ping latency information to Symphony
-	 */
-	@Override
-	public int ping() throws Exception {
-		if (isInitialized()) {
-			long pingResultTotal = 0L;
-
-			for (int i = 0; i < this.getPingAttempts(); i++) {
-				long startTime = System.currentTimeMillis();
-
-				try (Socket puSocketConnection = new Socket(this.host, this.getPort())) {
-					puSocketConnection.setSoTimeout(this.getPingTimeout());
-					if (puSocketConnection.isConnected()) {
-						long pingResult = System.currentTimeMillis() - startTime;
-						pingResultTotal += pingResult;
-						if (this.logger.isTraceEnabled()) {
-							this.logger.trace(String.format("PING OK: Attempt #%s to connect to %s on port %s succeeded in %s ms", i + 1, host, this.getPort(), pingResult));
-						}
-					} else {
-						if (this.logger.isDebugEnabled()) {
-							this.logger.debug(String.format("PING DISCONNECTED: Connection to %s did not succeed within the timeout period of %sms", host, this.getPingTimeout()));
-						}
-						return this.getPingTimeout();
-					}
-				} catch (SocketTimeoutException | ConnectException tex) {
-					if (this.logger.isDebugEnabled()) {
-						this.logger.error(String.format("PING TIMEOUT: Connection to %s did not succeed within the timeout period of %sms", host, this.getPingTimeout()));
-					}
-					throw new SocketTimeoutException("Connection timed out");
-				} catch (Exception e) {
-					if (this.logger.isDebugEnabled()) {
-						this.logger.error(String.format("PING TIMEOUT: Connection to %s did not succeed, UNKNOWN ERROR %s: ", host, e.getMessage()));
-					}
-					return this.getPingTimeout();
-				}
-			}
-			return Math.max(1, Math.toIntExact(pingResultTotal / this.getPingAttempts()));
-		} else {
-			throw new IllegalStateException("Cannot use device class without calling init() first");
-		}
 	}
 
 	/**
@@ -914,7 +864,6 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 				// as we have 36 properties by default and if all options are enabled, then we have a total of 37 properties.
 				if (localCachedFailedMonitor >= currentCommandIndex && currentGetMultipleInPollingInterval == pollingIntervalInIntValue) {
 					//Handle the case where all properties receive an error response and the case where 2 connections run in parallel to the device
-					ping();
 					isFirstInit = false;
 					statistics.put(LgWebOSConstants.CONTROL_PROTOCOL_STATUS, LgWebOSConstants.UNAVAILABLE);
 					countControlUnavailable++;
