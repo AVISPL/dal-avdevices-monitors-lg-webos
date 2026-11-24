@@ -3,6 +3,7 @@
  */
 package com.avispl.symphony.dal.communicator.lg.webos;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,5 +58,58 @@ public class LgWebOSButtonValueTest {
 
 		Assertions.assertEquals(LgWebOSConstants.NA, stats.get(property));
 		Assertions.assertEquals(LgWebOSConstants.NA, controls.get(0).getValue());
+	}
+
+	/**
+	 * Every button control has a statistic with the same name; Symphony does not show a control without one.
+	 */
+	private static void assertEveryButtonHasStatistic(Map<String, String> stats, List<AdvancedControllableProperty> controls) {
+		Assertions.assertFalse(controls.isEmpty(), "no controls were created");
+		for (AdvancedControllableProperty control : controls) {
+			if (control.getType() instanceof AdvancedControllableProperty.Button) {
+				Assertions.assertEquals(LgWebOSConstants.NA, stats.get(control.getName()), "statistic for button " + control.getName());
+			}
+		}
+	}
+
+	/**
+	 * The Reboot button is reported with a Reboot statistic of N/A, also when the power state is unknown.
+	 */
+	@Test
+	void testRebootButtonHasStatistic() throws Exception {
+		Map<String, String> stats = new HashMap<>();
+		List<AdvancedControllableProperty> controls = new ArrayList<>();
+
+		Method populate = LgWebOSDevice.class.getDeclaredMethod("populateDisplayPropertyGroup", LgControllingCommand.class, Map.class, List.class);
+		populate.setAccessible(true);
+		populate.invoke(lgWebOSDevice, LgControllingCommand.POWER, stats, controls);
+
+		Assertions.assertTrue(controls.stream().anyMatch(item -> LgWebOSConstants.REBOOT.equals(item.getName())), "Reboot control");
+		Assertions.assertEquals(LgWebOSConstants.NA, stats.get(LgWebOSConstants.REBOOT));
+		assertEveryButtonHasStatistic(stats, controls);
+	}
+
+	/**
+	 * The FailOver priority Up/Down buttons are reported with N/A statistics for the first, middle and last priority.
+	 */
+	@Test
+	void testPriorityButtonsHaveStatistics() throws Exception {
+		Map<String, String> priorities = new HashMap<>();
+		priorities.put(LgWebOSConstants.PRIORITY + 1, "HDMI1");
+		priorities.put(LgWebOSConstants.PRIORITY + 2, "HDMI2");
+		priorities.put(LgWebOSConstants.PRIORITY + 3, "DP");
+		Field cache = LgWebOSDevice.class.getDeclaredField("cacheMapOfPriorityInputAndValue");
+		cache.setAccessible(true);
+		cache.set(lgWebOSDevice, priorities);
+
+		Method populate = LgWebOSDevice.class.getDeclaredMethod("populatePriorityInput", Map.class, List.class, String.class, String.class);
+		populate.setAccessible(true);
+		String group = "FailOver#";
+		for (String current : new String[] { "HDMI1", "HDMI2", "DP" }) {
+			Map<String, String> stats = new HashMap<>();
+			List<AdvancedControllableProperty> controls = new ArrayList<>();
+			populate.invoke(lgWebOSDevice, stats, controls, group, current);
+			assertEveryButtonHasStatistic(stats, controls);
+		}
 	}
 }
