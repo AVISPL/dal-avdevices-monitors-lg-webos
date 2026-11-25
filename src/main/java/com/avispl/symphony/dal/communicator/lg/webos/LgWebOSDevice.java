@@ -19,9 +19,6 @@ import com.avispl.symphony.dal.communicator.lg.webos.LgWebOSConstants.syncStatus
 import com.avispl.symphony.dal.util.StringUtils;
 import org.springframework.util.CollectionUtils;
 
-import java.net.ConnectException;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
@@ -64,6 +61,11 @@ import java.util.stream.Collectors;
  * @since 1.4.0
  */
 public class LgWebOSDevice extends SocketCommunicator implements Controller, Monitorable {
+
+	/**
+	 * Adapter metadata (version, build date, uptime), reported in the AdapterMetadata group
+	 */
+	private final AdapterMetadata adapterMetadata;
 
 	int monitorID;
 	private int currentCommandIndex = 0;
@@ -219,6 +221,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 	 */
 	public LgWebOSDevice() {
 		super();
+		adapterMetadata = new AdapterMetadata();
 		this.setPort(9761);
 		this.monitorID = 1;
 
@@ -226,53 +229,6 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 		this.setCommandSuccessList(Collections.singletonList("OK"));
 		// set list of error response strings (included at the end of response when command fails, typically ending with command prompt)
 		this.setCommandErrorList(Collections.singletonList("NG"));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 * <p>
-	 *
-	 * Check for available devices before retrieving the value
-	 * ping latency information to Symphony
-	 */
-	@Override
-	public int ping() throws Exception {
-		if (isInitialized()) {
-			long pingResultTotal = 0L;
-
-			for (int i = 0; i < this.getPingAttempts(); i++) {
-				long startTime = System.currentTimeMillis();
-
-				try (Socket puSocketConnection = new Socket(this.host, this.getPort())) {
-					puSocketConnection.setSoTimeout(this.getPingTimeout());
-					if (puSocketConnection.isConnected()) {
-						long pingResult = System.currentTimeMillis() - startTime;
-						pingResultTotal += pingResult;
-						if (this.logger.isTraceEnabled()) {
-							this.logger.trace(String.format("PING OK: Attempt #%s to connect to %s on port %s succeeded in %s ms", i + 1, host, this.getPort(), pingResult));
-						}
-					} else {
-						if (this.logger.isDebugEnabled()) {
-							this.logger.debug(String.format("PING DISCONNECTED: Connection to %s did not succeed within the timeout period of %sms", host, this.getPingTimeout()));
-						}
-						return this.getPingTimeout();
-					}
-				} catch (SocketTimeoutException | ConnectException tex) {
-					if (this.logger.isDebugEnabled()) {
-						this.logger.error(String.format("PING TIMEOUT: Connection to %s did not succeed within the timeout period of %sms", host, this.getPingTimeout()));
-					}
-					throw new SocketTimeoutException("Connection timed out");
-				} catch (Exception e) {
-					if (this.logger.isDebugEnabled()) {
-						this.logger.error(String.format("PING TIMEOUT: Connection to %s did not succeed, UNKNOWN ERROR %s: ", host, e.getMessage()));
-					}
-					return this.getPingTimeout();
-				}
-			}
-			return Math.max(1, Math.toIntExact(pingResultTotal / this.getPingAttempts()));
-		} else {
-			throw new IllegalStateException("Cannot use device class without calling init() first");
-		}
 	}
 
 	/**
@@ -595,10 +551,10 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 								}
 								addOrUpdateStatisticProperties(stats,group + entry.getKey(), entry.getValue());
 							}
-							addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.EMPTY_STRING);
+							stats.put(group + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.NA);
 							advancedControllableProperties.add(createButton(group + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.UP, LgWebOSConstants.PROCESSING, 0));
 
-							addOrUpdateStatisticProperties(stats,group + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.EMPTY_STRING);
+							stats.put(group + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.NA);
 							advancedControllableProperties.add(createButton(group + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.DOWN, LgWebOSConstants.PROCESSING, 0));
 
 							String[] inputSelected = cacheMapOfPriorityInputAndValue.values().stream().filter(item -> !item.equalsIgnoreCase(LgWebOSConstants.PLAY_VIA_URL)).collect(Collectors.toList())
@@ -885,7 +841,10 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 		reentrantLock.lock();
 		try {
 			if (localExtendedStatistics == null) {
+				// returned until the first full collection: never with null statistics or controls, a control can arrive before it
 				localExtendedStatistics = new ExtendedStatistics();
+				localExtendedStatistics.setStatistics(new HashMap<>());
+				localExtendedStatistics.setControllableProperties(new ArrayList<>());
 			}
 			if (!isEmergencyDelivery) {
 				convertCacheLifetime();
@@ -899,13 +858,15 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 				//destroy channel after collecting all device's information
 				destroyChannel();
 				if (!isFirstInit && currentGetMultipleInPollingInterval < pollingIntervalInIntValue) {
+					if (localExtendedStatistics.getStatistics() != null) {
+						populateAdapterMetadata(localExtendedStatistics.getStatistics());
+					}
 					return Collections.singletonList(localExtendedStatistics);
 				}
 				//We will check if the value of localCachedFailedMonitor is greater than or equal to the value of currentCommandIndex,
 				// as we have 36 properties by default and if all options are enabled, then we have a total of 37 properties.
 				if (localCachedFailedMonitor >= currentCommandIndex && currentGetMultipleInPollingInterval == pollingIntervalInIntValue) {
 					//Handle the case where all properties receive an error response and the case where 2 connections run in parallel to the device
-					ping();
 					isFirstInit = false;
 					statistics.put(LgWebOSConstants.CONTROL_PROTOCOL_STATUS, LgWebOSConstants.UNAVAILABLE);
 					countControlUnavailable++;
@@ -928,6 +889,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 					extendedStatistics.setDynamicStatistics(dynamicStatistics);
 					countControlUnavailable = 0;
 				}
+				populateAdapterMetadata(statistics);
 				extendedStatistics.setStatistics(statistics);
 				extendedStatistics.setControllableProperties(advancedControllableProperties);
 				localExtendedStatistics = extendedStatistics;
@@ -937,6 +899,15 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 			reentrantLock.unlock();
 		}
 		return Collections.singletonList(localExtendedStatistics);
+	}
+
+	/**
+	 * Add the AdapterMetadata group (adapter version, build date, uptime) to the statistics
+	 *
+	 * @param statistics statistics to add the properties to
+	 */
+	private void populateAdapterMetadata(Map<String, String> statistics) {
+		adapterMetadata.populate(statistics);
 	}
 
 	/**
@@ -969,16 +940,16 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 			return;
 		}
 		if (!currentPriority.equals(priorityInputStart) && !currentPriority.equals(priorityInputEnd)) {
-			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.EMPTY_STRING);
+			stats.put(groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.NA);
 			advancedControllableProperties.add(createButton(groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.UP, LgWebOSConstants.PROCESSING, 0));
 
-			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.EMPTY_STRING);
+			stats.put(groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.NA);
 			advancedControllableProperties.add(createButton(groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.DOWN, LgWebOSConstants.PROCESSING, 0));
 		} else if (!StringUtils.isNullOrEmpty(priorityInputEnd) && !currentPriority.equals(priorityInputEnd)) {
-			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.EMPTY_STRING);
+			stats.put(groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.NA);
 			advancedControllableProperties.add(createButton(groupName + LgWebOSConstants.PRIORITY_DOWN, LgWebOSConstants.DOWN, LgWebOSConstants.PROCESSING, 0));
 		} else {
-			addOrUpdateStatisticProperties(stats,groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.EMPTY_STRING);
+			stats.put(groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.NA);
 			advancedControllableProperties.add(createButton(groupName + LgWebOSConstants.PRIORITY_UP, LgWebOSConstants.UP, LgWebOSConstants.PROCESSING, 0));
 		}
 	}
@@ -1218,8 +1189,10 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 		if (!advancedControllableProperties.isEmpty()) {
 			for (AdvancedControllableProperty advancedControllableProperty : advancedControllableProperties) {
 				if (advancedControllableProperty.getName().equals(property)) {
-					extendedStatistics.put(property, value);
-					advancedControllableProperty.setValue(value);
+					// buttons have no state: they always report N/A, not the pressed value
+					String newValue = advancedControllableProperty.getType() instanceof AdvancedControllableProperty.Button ? LgWebOSConstants.NA : value;
+					extendedStatistics.put(property, newValue);
+					advancedControllableProperty.setValue(newValue);
 					break;
 				}
 			}
@@ -1300,8 +1273,8 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 				AdvancedControllableProperty controlPower = controlSwitch(controlStatistics, LgWebOSConstants.POWER, value, LgWebOSConstants.OFF, LgWebOSConstants.ON);
 				checkControlPropertyBeforeAddNewProperty(controlPower, advancedControllableProperties);
 
-				addOrUpdateStatisticProperties(controlStatistics,LgWebOSConstants.REBOOT, LgWebOSConstants.EMPTY_STRING);
-				advancedControllableProperties.add(createButton(LgWebOSConstants.REBOOT, LgWebOSConstants.REBOOT, LgWebOSConstants.PROCESSING, 0));
+				controlStatistics.put(LgWebOSConstants.REBOOT, LgWebOSConstants.NA);
+				advancedControllableProperties.add(createButton(LgWebOSConstants.REBOOT, LgWebOSConstants.REBOOT, LgWebOSConstants.REBOOTING, LgWebOSConstants.REBOOT_GRACE_PERIOD));
 				break;
 			case ASPECT_RATIO:
 				value = getValueByName(LgWebOSConstants.ASPECT_RATIO);
@@ -2244,7 +2217,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 		button.setLabel(label);
 		button.setLabelPressed(labelPressed);
 		button.setGracePeriod(gracePeriod);
-		return new AdvancedControllableProperty(name, new Date(), button, LgWebOSConstants.EMPTY_STRING);
+		return new AdvancedControllableProperty(name, new Date(), button, LgWebOSConstants.NA);
 	}
 
 	/**

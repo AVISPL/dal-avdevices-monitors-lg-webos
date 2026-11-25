@@ -135,6 +135,11 @@ public class LgWebOSConstants {
 	public static String POWER = "Power";
 	public static String REBOOT = "Reboot";
 	public static String REBOOT_VALUE = "02";
+	public static final String REBOOTING = "Rebooting...";
+	/**
+	 * Time after a Reboot during which Symphony pauses monitoring of the display, in milliseconds
+	 */
+	public static final long REBOOT_GRACE_PERIOD = 120000L;
 	public static String FAN = "Fan";
 	public static String INPUT = "Input";
 	public static String TEMPERATURE = "Temperature(C)";
