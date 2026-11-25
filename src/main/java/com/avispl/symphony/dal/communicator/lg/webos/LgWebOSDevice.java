@@ -1271,7 +1271,7 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 				checkControlPropertyBeforeAddNewProperty(controlPower, advancedControllableProperties);
 
 				controlStatistics.put(LgWebOSConstants.REBOOT, LgWebOSConstants.NA);
-				advancedControllableProperties.add(createButton(LgWebOSConstants.REBOOT, LgWebOSConstants.REBOOT, LgWebOSConstants.PROCESSING, 0));
+				advancedControllableProperties.add(createButton(LgWebOSConstants.REBOOT, LgWebOSConstants.REBOOT, LgWebOSConstants.REBOOTING, LgWebOSConstants.REBOOT_GRACE_PERIOD));
 				break;
 			case ASPECT_RATIO:
 				value = getValueByName(LgWebOSConstants.ASPECT_RATIO);
