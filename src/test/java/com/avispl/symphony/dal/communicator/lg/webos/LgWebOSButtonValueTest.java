@@ -73,7 +73,8 @@ public class LgWebOSButtonValueTest {
 	}
 
 	/**
-	 * The Reboot button is reported with a Reboot statistic of N/A, also when the power state is unknown.
+	 * The Reboot button is reported with a Reboot statistic of N/A, also when the power state is unknown, and pauses
+	 * monitoring for the reboot grace period.
 	 */
 	@Test
 	void testRebootButtonHasStatistic() throws Exception {
@@ -84,7 +85,10 @@ public class LgWebOSButtonValueTest {
 		populate.setAccessible(true);
 		populate.invoke(lgWebOSDevice, LgControllingCommand.POWER, stats, controls);
 
-		Assertions.assertTrue(controls.stream().anyMatch(item -> LgWebOSConstants.REBOOT.equals(item.getName())), "Reboot control");
+		AdvancedControllableProperty reboot = controls.stream().filter(item -> LgWebOSConstants.REBOOT.equals(item.getName())).findFirst()
+				.orElseThrow(() -> new AssertionError("Reboot control"));
+		// SYAL-2241: Symphony pauses monitoring for the button's grace period while the display reboots
+		Assertions.assertEquals(LgWebOSConstants.REBOOT_GRACE_PERIOD, ((AdvancedControllableProperty.Button) reboot.getType()).getGracePeriod());
 		Assertions.assertEquals(LgWebOSConstants.NA, stats.get(LgWebOSConstants.REBOOT));
 		assertEveryButtonHasStatistic(stats, controls);
 	}
