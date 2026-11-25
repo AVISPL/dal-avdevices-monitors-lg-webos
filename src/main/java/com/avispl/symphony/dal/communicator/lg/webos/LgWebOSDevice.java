@@ -841,7 +841,10 @@ public class LgWebOSDevice extends SocketCommunicator implements Controller, Mon
 		reentrantLock.lock();
 		try {
 			if (localExtendedStatistics == null) {
+				// returned until the first full collection: never with null statistics or controls, a control can arrive before it
 				localExtendedStatistics = new ExtendedStatistics();
+				localExtendedStatistics.setStatistics(new HashMap<>());
+				localExtendedStatistics.setControllableProperties(new ArrayList<>());
 			}
 			if (!isEmergencyDelivery) {
 				convertCacheLifetime();
